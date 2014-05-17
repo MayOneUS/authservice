@@ -36,10 +36,18 @@ NAME_FIELD_NAME = {
   "foursquare": "firstName",
   "openid": "nickname",
 }
+SESSION_EXPIRY = 60 * 60 * 24 * 5  # 5 days in seconds
 APP_CONFIG = {
   "webapp2_extras.sessions": {
     "cookie_name": "_simpleauth_sess",
     "secret_key": "<secret_key>",
+    "session_max_age": SESSION_EXPIRY,
+    "cookie_args": {
+      "max_age": SESSION_EXPIRY,
+      "domain": ".%s" % ROOT_DOMAIN,
+      "secure": True,
+      "httponly": True,
+    },
   },
   "webapp2_extras.auth": {
     "user_attributes": [],
