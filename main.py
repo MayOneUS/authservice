@@ -36,21 +36,20 @@ NAME_FIELD_NAME = {
   "foursquare": "firstName",
   "openid": "nickname",
 }
-SESSION_EXPIRY = 60 * 60 * 24 * 5  # 5 days in seconds
 APP_CONFIG = {
   "webapp2_extras.sessions": {
-    "cookie_name": "_simpleauth_sess",
+    "cookie_name": "_auth_session",
     "secret_key": "<secret_key>",
-    "session_max_age": SESSION_EXPIRY,
     "cookie_args": {
-      "max_age": SESSION_EXPIRY,
+      "max_age": None,
       "domain": ".%s" % ROOT_DOMAIN,
+      "path": "/",
       "secure": True,
       "httponly": True,
     },
   },
   "webapp2_extras.auth": {
-    "user_attributes": [],
+    "cookie_name": "auth",
   },
 }
 
@@ -83,7 +82,7 @@ class SessionHandler(webapp2.RequestHandler):
     return self.current_user is not None
 
   def safe_return_to(self):
-    return_to = self.request.get("return_to").encode("ascii")
+    return_to = self.request.get("return_to", "").encode("ascii")
     if not return_to:
       return None
     p = urlparse.urlparse(return_to)
@@ -110,7 +109,7 @@ class AuthHandler(SessionHandler, SimpleAuthHandler):
     return PROVIDER_CONFIG[provider]
 
   def _on_signin(self, data, auth_info, provider):
-    target_loc = self.session.get("return_to").encode("ascii")
+    target_loc = self.session.pop("return_to", "").encode("ascii")
     if not target_loc:
       target_loc = DEFAULT_REDIRECT
     if self.logged_in:
@@ -143,6 +142,9 @@ class AuthHandler(SessionHandler, SimpleAuthHandler):
     self.redirect(target_loc)
 
   def _simple_auth(self, *args, **kwargs):
+    if self.logged_in:
+      self.redirect(self.safe_return_to() or DEFAULT_REDIRECT)
+      return
     self.session["return_to"] = self.safe_return_to()
     return SimpleAuthHandler._simple_auth(self, *args, **kwargs)
 
@@ -153,6 +155,7 @@ class CurrentUserHandler(SessionHandler):
     user = self.current_user
     if user is not None:
       self.response.write(json.dumps({
+        "logged_in": True,
         "user": {
           "user_id": user.get_id(),
           "name": user.name,
@@ -169,7 +172,7 @@ class CurrentUserHandler(SessionHandler):
                                        **qargs)
       # TODO: add openid peeps
       self.response.write(json.dumps({
-        "logged_out": True,
+        "logged_in": False,
         "login_links": links,
       }))
 
