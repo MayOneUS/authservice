@@ -1,3 +1,8 @@
+# You'll need to copy this file into place for the system to work.
+# run:
+#  cp config_NOCOMMIT_README config_NOCOMMIT.py
+# then make appropriate edits
+
 ROOT_DOMAIN = "mayone.us"
 
 AUTH_DOMAIN = "auth.%s" % ROOT_DOMAIN

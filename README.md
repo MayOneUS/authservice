@@ -8,7 +8,7 @@ Please see https://github.com/MayOneUS/wiki/wiki/My-SuperPAC-design-doc
 
 First, make sure the service is configured. You'll need to run
 
-    cp config_NOCOMMIT_template config_NOCOMMIT.py
+    cp config_NOCOMMIT_README config_NOCOMMIT.py
 
 and then edit `config_NOCOMMIT.py` to contain some API keys and secrets.
 
