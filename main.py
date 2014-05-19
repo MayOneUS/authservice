@@ -7,39 +7,16 @@ from webapp2_extras import auth, sessions
 
 from simpleauth import SimpleAuthHandler
 
+from providers import NAME_FIELD_NAME, SCOPES, OPENID_IDENTITY_URLS
 
-ROOT_DOMAIN = "mayone.us"
-AUTH_DOMAIN = "auth.%s" % ROOT_DOMAIN
-DEFAULT_REDIRECT = "https://%s" % ROOT_DOMAIN
-PROVIDER_CONFIG = {
-  # oauth2
-  "google":       ("<appid>", "<appsecret>",
-                   "https://www.googleapis.com/auth/userinfo.profile"),
-  "linkedin2":    ("<key>", "<secret>", "r_basicprofile"),
-  "facebook":     ("<appid>", "<appsecret>", "public_profile"),
-  "windows_live": ("<clientid>", "<clientsecret>", "wl.signin"),
-  "foursquare":   ("<clientid>", "<clientsecret>", "authorization_code"),
+from config_NOCOMMIT import ROOT_DOMAIN, AUTH_DOMAIN, DEFAULT_REDIRECT, \
+    PROVIDER_CONFIG, SECRET_KEY, OPENID_ENABLED
 
-  # oauth1
-  "twitter":      ("<consumerkey>", "<consumersecret>"),
-  "linkedin":     ("<key>", "<secret>"),
 
-  #openid needs nothing
-}
-NAME_FIELD_NAME = {
-  "facebook": "name",
-  "google": "name",
-  "windows_live": "name",
-  "twitter": "screen_name",
-  "linkedin": "first-name",
-  "linkedin2": "first-name",
-  "foursquare": "firstName",
-  "openid": "nickname",
-}
 APP_CONFIG = {
   "webapp2_extras.sessions": {
     "cookie_name": "_auth_session",
-    "secret_key": "<secret_key>",
+    "secret_key": SECRET_KEY,
     "cookie_args": {
       "max_age": None,
       "domain": ".%s" % ROOT_DOMAIN,
@@ -106,7 +83,10 @@ class AuthHandler(SessionHandler, SimpleAuthHandler):
                         _netloc=AUTH_DOMAIN)
 
   def _get_consumer_info_for(self, provider):
-    return PROVIDER_CONFIG[provider]
+    key, secret = PROVIDER_CONFIG[provider]
+    if key in SCOPES:
+      return key, secret, SCOPES[key]
+    return key, secret
 
   def _on_signin(self, data, auth_info, provider):
     target_loc = self.session.pop("return_to", "").encode("ascii")
@@ -120,8 +100,10 @@ class AuthHandler(SessionHandler, SimpleAuthHandler):
       return
 
     auth_id = "%s:%s" % (provider, data["id"])
-    # TODO: right now we only get the user's name from the provider.
-    user_data = {"name": data[NAME_FIELD_NAME[provider]]}
+
+    # TODO: get more user data from each provider
+    user_data = {"name": data[NAME_FIELD_NAME[provider]],
+                 "provider": provider}
 
     user = self.auth.store.user_model.get_by_auth_id(auth_id)
 
@@ -159,6 +141,7 @@ class CurrentUserHandler(SessionHandler):
         "user": {
           "user_id": user.get_id(),
           "name": user.name,
+          "provider": user.provider,
         }
       }))
     else:
@@ -170,7 +153,13 @@ class CurrentUserHandler(SessionHandler):
         links[provider] = self.uri_for("auth_login", provider=provider,
                                        _scheme="https", _netloc=AUTH_DOMAIN,
                                        **qargs)
-      # TODO: add openid peeps
+      if OPENID_ENABLED:
+        for provider, url in OPENID_IDENTITY_URLS.iteritems():
+          qargs_copy = qargs.copy()
+          qargs_copy["identity_url"] = url
+          links[provider] = self.uri_for("auth_login", provider="openid",
+                                         _scheme="https", _netloc=AUTH_DOMAIN,
+                                         **qargs_copy)
       self.response.write(json.dumps({
         "logged_in": False,
         "login_links": links,
