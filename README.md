@@ -31,3 +31,6 @@ its IP address by running
     docker inspect -f "{{.NetworkSettings.IPAddress}}" container_id
 
 Finally, add the container's IP and `auth.mayone.us` to your `/etc/hosts` file.
+
+Another sample app that uses `auth.mayone.us` is checked in under the
+`example/` subdir. Setting it up to use HTTPS is similar.
