@@ -1,4 +1,5 @@
 import json
+import logging
 import urlparse
 
 import webapp2
@@ -84,8 +85,8 @@ class AuthHandler(SessionHandler, SimpleAuthHandler):
 
   def _get_consumer_info_for(self, provider):
     key, secret = PROVIDER_CONFIG[provider]
-    if key in SCOPES:
-      return key, secret, SCOPES[key]
+    if provider in SCOPES:
+      return key, secret, SCOPES[provider]
     return key, secret
 
   def _on_signin(self, data, auth_info, provider):
@@ -139,7 +140,7 @@ class CurrentUserHandler(SessionHandler):
       self.response.write(json.dumps({
         "logged_in": True,
         "user": {
-          "user_id": user.get_id(),
+          "user_id": user.key.urlsafe(),
           "name": user.name,
           "provider": user.provider,
         }
