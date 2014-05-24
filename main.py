@@ -173,6 +173,11 @@ class LogoutHandler(SessionHandler):
     self.redirect(self.safe_return_to() or DEFAULT_REDIRECT)
 
 
+class RedirectHandler(webapp2.RequestHandler):
+  def get(self):
+    self.redirect(DEFAULT_REDIRECT)
+
+
 app = webapp2.WSGIApplication([
   webapp2.Route('/v1/current_user', handler=CurrentUserHandler,
                 name='current_user'),
@@ -181,4 +186,5 @@ app = webapp2.WSGIApplication([
                 handler_method='_simple_auth', name='auth_login'),
   webapp2.Route('/v1/_cb/<provider>', handler=AuthHandler,
                 handler_method='_auth_callback', name='auth_callback'),
+  webapp2.Route('/', handler=RedirectHandler),
 ], config=APP_CONFIG, debug=False)
