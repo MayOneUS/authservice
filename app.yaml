@@ -1,4 +1,4 @@
-application: authservice-dev
+application: mayday-pac-auth
 version: 1
 runtime: python27
 api_version: 1
