@@ -31,9 +31,24 @@ APP_CONFIG = {
   },
 }
 
+def enable_cors(handler):
+  if 'Origin' in handler.request.headers:
+    origin = handler.request.headers['Origin']
+    _, netloc, _, _, _, _ = urlparse.urlparse(origin)    
+    if not (netloc == 'mayone.us' or netloc.endswith('.mayone.us')):
+      logging.warning('Invalid origin: ' + origin)
+      handler.error(403)
+      return
 
+    handler.response.headers.add_header("Access-Control-Allow-Origin", origin)
+    handler.response.headers.add_header("Access-Control-Allow-Methods", "POST")
+    handler.response.headers.add_header("Access-Control-Allow-Headers",
+                                        "content-type, origin")
+                                        
 class SessionHandler(webapp2.RequestHandler):
+
   def dispatch(self):
+    enable_cors(self)
     self.session_store = sessions.get_store(request=self.request)
     try:
       webapp2.RequestHandler.dispatch(self)
