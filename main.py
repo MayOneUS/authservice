@@ -44,6 +44,8 @@ def enable_cors(handler):
     handler.response.headers.add_header("Access-Control-Allow-Methods", "POST")
     handler.response.headers.add_header("Access-Control-Allow-Headers",
                                         "content-type, origin")
+    handler.response.headers.add_header("Access-Control-Allow-Credentials",
+                                        "true")
 
 class SessionHandler(webapp2.RequestHandler):
 
