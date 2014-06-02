@@ -106,7 +106,7 @@ class AuthHandler(SessionHandler, SimpleAuthHandler):
     return key, secret
 
   def _on_signin(self, data, auth_info, provider):
-    target_loc = self.session.pop("return_to", "").encode("ascii")
+    target_loc = (self.session.pop("return_to") or "").encode("ascii")
     if not target_loc:
       target_loc = DEFAULT_REDIRECT
     if self.logged_in:
