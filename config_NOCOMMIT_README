@@ -3,7 +3,7 @@
 #  cp config_NOCOMMIT_README config_NOCOMMIT.py
 # then make appropriate edits
 
-ROOT_DOMAIN = "mayone.us"
+ROOT_DOMAIN = "mayday.us"
 
 AUTH_DOMAIN = "auth.%s" % ROOT_DOMAIN
 

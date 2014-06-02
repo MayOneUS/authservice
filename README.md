@@ -1,6 +1,6 @@
 # authservice
 
-auth.mayone.us
+auth.mayday.us
 
 Please see https://github.com/MayOneUS/wiki/wiki/My-SuperPAC-design-doc
 
@@ -13,9 +13,9 @@ First, make sure the service is configured. You'll need to run
 and then edit `config_NOCOMMIT.py` to contain some API keys and secrets.
 
 This service must run over HTTPS on something that your computer's hostname
-resolution thinks is `auth.mayone.us`. This is because we are using secure
+resolution thinks is `auth.mayday.us`. This is because we are using secure
 cookies, which your browser requires pass over HTTPS for subdomains of
-`mayone.us`.
+`mayday.us`.
 
 The easiest way to get an HTTPS server running is to run
 
@@ -30,7 +30,7 @@ its IP address by running
 
     docker inspect -f "{{.NetworkSettings.IPAddress}}" container_id
 
-Finally, add the container's IP and `auth.mayone.us` to your `/etc/hosts` file.
+Finally, add the container's IP and `auth.mayday.us` to your `/etc/hosts` file.
 
-Another sample app that uses `auth.mayone.us` is checked in under the
+Another sample app that uses `auth.mayday.us` is checked in under the
 `example/` subdir. Setting it up to use HTTPS is similar.

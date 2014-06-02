@@ -6,7 +6,7 @@ import webapp2
 
 from google.appengine.api import urlfetch
 
-AUTH_SERVICE_PUB = "https://auth.mayone.us"
+AUTH_SERVICE_PUB = "https://auth.mayday.us"
 AUTH_SERVICE_REQ = AUTH_SERVICE_PUB  # "http://172.17.0.2"
 
 

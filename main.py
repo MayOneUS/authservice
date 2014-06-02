@@ -35,7 +35,7 @@ def enable_cors(handler):
   if 'Origin' in handler.request.headers:
     origin = handler.request.headers['Origin']
     _, netloc, _, _, _, _ = urlparse.urlparse(origin)
-    if not (netloc == 'mayone.us' or netloc.endswith('.mayone.us')):
+    if not (netloc == ROOT_DOMAIN or netloc.endswith(".%s" % ROOT_DOMAIN)):
       logging.warning('Invalid origin: ' + origin)
       handler.error(403)
       return
