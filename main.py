@@ -58,9 +58,9 @@ class SessionHandler(webapp2.RequestHandler):
     self.session_store = sessions.get_store(request=self.request)
     try:
       webapp2.RequestHandler.dispatch(self)
-    except:
-      self.redirect(self.safe_return_to() or DEFAULT_REDIRECT)
-      return
+    except Exception:
+      logging.exception("failed dispatching request")
+      return self.redirect(self.safe_return_to() or DEFAULT_REDIRECT)
     finally:
       self.session_store.save_sessions(self.response)
 
